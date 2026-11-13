@@ -44,14 +44,18 @@ export default function OpportunityCard({ opportunity, isSaved, onToggleSave }) 
       <p className="mt-2 flex-1 text-sm text-slate-700">{description}</p>
 
       <div className="mt-3 flex items-center justify-between">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col items-start gap-1">
           {priceDisplay}
           {/* Ternary: never prints a bare 0 */}
           <span className="text-xs text-slate-500">
             {capacity > 0 ? `${capacity} places left` : 'No places left'}
           </span>
         </div>
-        <Button variant="secondary" onClick={() => onToggleSave(opportunity.id)} aria-pressed={isSaved}>
+        <Button
+          variant="secondary"
+          onClick={() => onToggleSave(opportunity.id)}
+          aria-pressed={isSaved}
+        >
           {isSaved ? 'Unsave' : 'Save'}
         </Button>
       </div>

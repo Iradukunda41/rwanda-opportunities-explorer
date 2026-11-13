@@ -5,16 +5,14 @@ import OpportunityFilters from './components/OpportunityFilters'
 import Button from './components/Button'
 
 export default function App() {
-  // Data (will grow in Step 6 when we add the form)
   const [opportunities, setOpportunities] = useState(seedOpportunities)
 
-  // Control state
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('date')
   const [availableOnly, setAvailableOnly] = useState(false)
   const [savedOnly, setSavedOnly] = useState(false)
-  const [savedIds, setSavedIds] = useState([]) // wired up in Step 5
+  const [savedIds, setSavedIds] = useState([])
 
   const resetFilters = () => {
     setSearch('')
@@ -24,7 +22,12 @@ export default function App() {
     setSavedOnly(false)
   }
 
-  // Derive the visible list while rendering
+  const toggleSave = (id) => {
+    setSavedIds((prev) =>
+      prev.includes(id) ? prev.filter((savedId) => savedId !== id) : [...prev, id]
+    )
+  }
+
   const query = search.trim().toLowerCase()
 
   const filtered = opportunities.filter((opp) => {
@@ -38,19 +41,19 @@ export default function App() {
     return matchesSearch && matchesCategory && matchesAvailable && matchesSaved
   })
 
-  // Sort an independent copy, never the state array itself
   const visible = [...filtered].sort((a, b) => {
     if (sort === 'title') return a.title.localeCompare(b.title)
     if (sort === 'seats') return b.capacity - a.capacity
-    return a.date.localeCompare(b.date) // earliest date
+    return a.date.localeCompare(b.date)
   })
 
-  // Precomputed JSX: empty state or the list
   const content =
     visible.length === 0 ? (
       <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
         <p className="mb-3 text-slate-700">
-          No opportunities match your search. Try different words or clear your filters.
+          {savedOnly && savedIds.length === 0
+            ? 'You have not saved any opportunities yet. Save one, or reset the filters.'
+            : 'No opportunities match your search. Try different words or clear your filters.'}
         </p>
         <Button onClick={resetFilters}>Reset filters</Button>
       </div>
@@ -58,7 +61,7 @@ export default function App() {
       <OpportunityList
         opportunities={visible}
         savedIds={savedIds}
-        onToggleSave={() => {}}
+        onToggleSave={toggleSave}
       />
     )
 
@@ -67,6 +70,9 @@ export default function App() {
       <header className="bg-emerald-700 px-4 py-6 text-white">
         <h1 className="text-2xl font-bold">Rwanda Opportunities Explorer</h1>
         <p className="text-sm text-emerald-100">Sample content: all events are fictional.</p>
+        <p className="mt-2 text-sm font-medium" aria-live="polite">
+          {`Saved: ${savedIds.length}`}
+        </p>
       </header>
 
       <main className="mx-auto max-w-6xl p-4">
