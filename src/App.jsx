@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { seedOpportunities, categories } from './data/seedOpportunities'
 import OpportunityList from './components/OpportunityList'
 import OpportunityFilters from './components/OpportunityFilters'
+import AddOpportunityForm from './components/AddOpportunityForm'
+import StatusDemoControls from './components/StatusDemoControls'
+import LoadingState from './components/LoadingState'
+import Alert from './components/Alert'
 import Button from './components/Button'
 
 export default function App() {
@@ -13,6 +17,7 @@ export default function App() {
   const [availableOnly, setAvailableOnly] = useState(false)
   const [savedOnly, setSavedOnly] = useState(false)
   const [savedIds, setSavedIds] = useState([])
+  const [demoStatus, setDemoStatus] = useState('ready')
 
   const resetFilters = () => {
     setSearch('')
@@ -26,6 +31,11 @@ export default function App() {
     setSavedIds((prev) =>
       prev.includes(id) ? prev.filter((savedId) => savedId !== id) : [...prev, id]
     )
+  }
+
+  const addOpportunity = (newOpportunity) => {
+    setOpportunities((prev) => [newOpportunity, ...prev])
+    resetFilters()
   }
 
   const query = search.trim().toLowerCase()
@@ -47,8 +57,22 @@ export default function App() {
     return a.date.localeCompare(b.date)
   })
 
-  const content =
-    visible.length === 0 ? (
+  // Precomputed JSX: choose what to show using if / else if
+  let content
+  if (demoStatus === 'loading') {
+    content = <LoadingState />
+  } else if (demoStatus === 'error') {
+    content = (
+      <Alert
+        tone="error"
+        title="Something went wrong"
+        action={<Button onClick={() => setDemoStatus('ready')}>Try again</Button>}
+      >
+        We could not load the opportunities. This is a demo error, so no real request failed.
+      </Alert>
+    )
+  } else if (visible.length === 0) {
+    content = (
       <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
         <p className="mb-3 text-slate-700">
           {savedOnly && savedIds.length === 0
@@ -57,13 +81,16 @@ export default function App() {
         </p>
         <Button onClick={resetFilters}>Reset filters</Button>
       </div>
-    ) : (
+    )
+  } else {
+    content = (
       <OpportunityList
         opportunities={visible}
         savedIds={savedIds}
         onToggleSave={toggleSave}
       />
     )
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -76,6 +103,10 @@ export default function App() {
       </header>
 
       <main className="mx-auto max-w-6xl p-4">
+        <AddOpportunityForm categories={categories} onAddOpportunity={addOpportunity} />
+
+        <StatusDemoControls demoStatus={demoStatus} onChange={setDemoStatus} />
+
         <OpportunityFilters
           search={search}
           onSearchChange={setSearch}
