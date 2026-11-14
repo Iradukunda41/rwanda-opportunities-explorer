@@ -49,7 +49,7 @@ npm run lint      # check the code with ESLint
 public/
   images/
     workshop.jpg
-    learning.jpg
+    course.jpg
     career.jpg
     community.jpg
 src/
