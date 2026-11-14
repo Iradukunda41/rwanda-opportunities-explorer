@@ -4,6 +4,8 @@ A responsive React application that helps learners discover workshops, career ev
 
 All data is sample content and is fictional. There is no backend, API, database, fetch call or React Router. Everything is kept in the frontend.
 
+**Live site:** https://rwanda-opportunities-explorer-agj8.vercel.app
+
 ## Technologies
 
 - React 19 (function components, JSX, props, `useState`, and `useEffect` for the banner slider)
